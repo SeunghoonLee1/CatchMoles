@@ -53,10 +53,10 @@ header {
   margin: 5px;
   display: inline-block;
   line-height: 50px;
-  width: 50px;
+  width: 100px;
   height: 50px;
   border: 5px solid black;
-  border-radius: 50%;
+  border-radius: 20%;
   /* margin: auto; */
   background-color: darkslateblue;
   color: white;
@@ -92,6 +92,22 @@ header {
   justify-content: space-around;
   align-items: center;
   margin-top: 20px;
+}
+
+/* .hole:hover {
+  transform: scale(1.1);
+} */
+
+.mole:hover {
+  transform: scale(1.1);
+}
+
+.angry__mole:hover {
+  transform: scale(1.1);
+}
+
+.moles:hover {
+  transform: scale(1.1);
 }
 
 .pop-up {
