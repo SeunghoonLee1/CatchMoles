@@ -1,7 +1,7 @@
 'use strict';
 
-const moleSound = new Audio('./sound/mole_hit.mp3');
-const angryMoleSound = new Audio('./sound/bug_hit.mp3');
+const moleSound = new Audio('./sound/mole_hit.wav');
+const angryMoleSound = new Audio('./sound/angryMole_hit.wav');
 const alertSound = new Audio('./sound/alert.wav');
 const bgSound = new Audio('./sound/bg.mp3');
 const winSound = new Audio('./sound/game_win.mp3');
