@@ -2,6 +2,7 @@
 
 import * as sound from './sound.js';
 
+const gameBtn = document.querySelector('.game__button');
 const mole = document.querySelector('.mole');
 const angryMole = document.querySelector('.angry__mole');
 const gameField = document.querySelector('.game__field');
@@ -10,9 +11,75 @@ const gameScore = document.querySelector('.game__score');
 const angryHitScore = 10;
 const moleHitScore = 10;
 const molesHitScore = 30;
+const popUp = document.querySelector('.pop-up');
+const popUpMsg = document.querySelector('.pop-up__message');
+const popUpRefresh = document.querySelector('.pop-up__refresh');
 
-
+let started = false;
+let score = 0;
+let timer = undefined;
 gameScore.innerHTML = 0;
+
+gameBtn.addEventListener('click', ()=>{
+  if(started){
+    stopGame();
+  }else{
+    startGame();
+  }
+});
+
+function initGame(){
+  score = 0;
+
+}
+
+function startGame(){
+  started = true;
+  initGame();
+  showStopBtn();
+
+}
+
+function stopGame(){
+  started = false;
+  hideStopBtn();
+  showPopUp('stop');
+}
+
+function showStopBtn(){
+  gameBtn.style.visibility = 'visible';
+  gameBtn.innerHTML = '<i class="fas fa-stop"></i>';
+}
+
+function hideStopBtn(){
+  gameBtn.style.visibility = 'hidden';
+}
+
+function showPopUp(reason){
+  switch(reason){
+    case 'timeOver':
+      popUpMsg.innerText = 'Time over!';
+      break;
+    case 'stop':
+      popUpMsg.innerText = 'Replay?';
+      break;
+    default:
+      console.log('invalid reason!');
+      break;
+  }
+  popUp.classList.remove('pop-up--hide');
+}
+
+function hidePopUp(){
+  popUp.classList.add('pop-up--hide');
+}
+
+popUpRefresh.addEventListener('click', ()=> {
+  startGame();
+  hidePopUp();
+});
+
+
 
 gameField.addEventListener('click', (event)=>{
   const target = event.target;
