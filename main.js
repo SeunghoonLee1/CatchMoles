@@ -2,11 +2,18 @@
 
 import * as sound from './sound.js';
 
+const GAME_DURATION_SEC = 10;
+
 const gameBtn = document.querySelector('.game__button');
-const mole = document.querySelector('.mole');
-const angryMole = document.querySelector('.angry__mole');
+// const mole = document.querySelector('.mole');
+// const angryMole = document.querySelector('.angry__mole');
 const gameField = document.querySelector('.game__field');
 const holePath = './img/hole.png';
+const molePath = './img/mole.png';
+const angryMolePath = './img/angryMole.png';
+const molesPath = './img/3moles.png';
+
+const gameTime = document.querySelector('.game__timer');
 const gameScore = document.querySelector('.game__score');
 const angryHitScore = 10;
 const moleHitScore = 10;
@@ -15,14 +22,19 @@ const popUp = document.querySelector('.pop-up');
 const popUpMsg = document.querySelector('.pop-up__message');
 const popUpRefresh = document.querySelector('.pop-up__refresh');
 
+
+
 let started = false;
 let score = 0;
 let timer = undefined;
+let generator = undefined;
+let numFilled = 0;
 gameScore.innerHTML = 0;
 
 gameBtn.addEventListener('click', ()=>{
   if(started){
     stopGame();
+    sound.playAlert();
   }else{
     startGame();
   }
@@ -30,20 +42,74 @@ gameBtn.addEventListener('click', ()=>{
 
 function initGame(){
   score = 0;
-
+  numFilled = 0;
+  gameScore.innerText = score;
+  startTimer();
+  showMoles();
 }
 
 function startGame(){
   started = true;
   initGame();
   showStopBtn();
-
 }
 
-function stopGame(){
+function startTimer(){
+  let remainTimeSec = GAME_DURATION_SEC;
+  updateTime(remainTimeSec);
+  timer = setInterval(() => {
+    if(remainTimeSec <= 0){
+      clearInterval(timer);
+      clearInterval(generator);
+      stopGame('timeOver');
+      return;
+    }
+    updateTime(--remainTimeSec);
+  }, 1000);
+}
+
+function showMoles(){
+  let idNum = randomPos();
+  let nextPos = document.querySelector(`#pos${idNum}`);
+  // console.log(`idNum : ${idNum}, className : ${nextPos.className}`);
+  generator = setInterval(() =>{
+    if(numFilled === 9){
+      return;
+    }
+    while(nextPos.className !== 'hole'){
+      idNum = randomPos();
+      nextPos = document.querySelector(`#pos${idNum}`);
+    }
+    let nextIcon = randomIcon();
+    console.log(`nextIcon : ${nextIcon}`);
+    switch(nextIcon){
+      case 1:
+        nextPos.setAttribute('class', 'mole');
+        nextPos.setAttribute('src', molePath);   
+        numFilled++;    
+      break;
+      case 2:
+        nextPos.setAttribute('class', 'moles');
+        nextPos.setAttribute('src', molesPath);   
+        numFilled++;  
+      break;
+      case 3:
+        nextPos.setAttribute('class', 'angry__mole');
+        nextPos.setAttribute('src', angryMolePath);
+        numFilled++;  
+      break;
+      default:
+        console.log('something wrong.');
+      break;
+    }
+  }, 1000);
+}
+
+function stopGame(reason){
   started = false;
   hideStopBtn();
-  showPopUp('stop');
+  clearInterval(timer);
+  showPopUp(reason);
 }
 
 function showStopBtn(){
@@ -88,16 +154,19 @@ gameField.addEventListener('click', (event)=>{
     sound.playMole();
     target.setAttribute('class', 'hole');
     target.setAttribute('src', holePath);
+    numFilled --;
     updateScore('mole');
   }else if(target.matches('.angry__mole')){
     sound.playAngry();
     target.setAttribute('class', 'hole');
     target.setAttribute('src', holePath);
+    numFilled --;
     updateScore('angryMole');
   }else if(target.matches('.moles')){
     sound.playMole();
     target.setAttribute('class', 'hole');
     target.setAttribute('src', holePath);
+    numFilled --;
     updateScore('moles');
   }
 });
@@ -126,4 +195,19 @@ function updateScore(hitObj){
     console.log('Invalid input!');
     break;
   }
+}
+
+function updateTime(timeSec){
+  let min = Math.floor(timeSec / 60);
+  let sec = timeSec % 60;
+
+  gameTime.innerHTML = `${min}:${sec}`;
+}
+
+function randomPos(){
+  return Math.floor(Math.random() * 9 + 1); //1~9
+}
+
+function randomIcon(){
+  return Math.floor(Math.random() * 3 + 1); //1~3
 }
