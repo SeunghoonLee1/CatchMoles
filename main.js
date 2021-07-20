@@ -3,6 +3,7 @@
 import * as sound from './sound.js';
 
 const GAME_DURATION_SEC = 10;
+const MAX_HOLES = 9;
 
 const gameBtn = document.querySelector('.game__button');
 // const mole = document.querySelector('.mole');
@@ -45,6 +46,7 @@ function initGame(){
   numFilled = 0;
   gameScore.innerText = score;
   startTimer();
+  clearBoard();
   showMoles();
 }
 
@@ -68,34 +70,53 @@ function startTimer(){
   }, 1000);
 }
 
+function clearBoard(){
+  let idNum;
+  for(idNum = 1; idNum <= MAX_HOLES; idNum++){
+    let pos = document.querySelector(`#pos${idNum}`);
+    if(pos.className !== 'hole'){
+      pos.setAttribute('class', 'hole');
+      pos.setAttribute('src', holePath); 
+      pos.setAttribute('secAboveGround', 0); 
+    }
+  }
+}
+
+
 function showMoles(){
   let idNum = randomPos();
   let nextPos = document.querySelector(`#pos${idNum}`);
+
   // console.log(`idNum : ${idNum}, className : ${nextPos.className}`);
   generator = setInterval(() =>{
     if(numFilled === 9){
+      stopGame('full');
       return;
     }
     while(nextPos.className !== 'hole'){
       idNum = randomPos();
       nextPos = document.querySelector(`#pos${idNum}`);
     }
+    console.log(`idNum : ${idNum}`);
     let nextIcon = randomIcon();
     console.log(`nextIcon : ${nextIcon}`);
     switch(nextIcon){
       case 1:
         nextPos.setAttribute('class', 'mole');
-        nextPos.setAttribute('src', molePath);   
+        nextPos.setAttribute('src', molePath); 
+        nextPos.setAttribute('secAboveGround', 1);  
         numFilled++;    
       break;
       case 2:
         nextPos.setAttribute('class', 'moles');
         nextPos.setAttribute('src', molesPath);   
+        nextPos.setAttribute('secAboveGround', 1);  
         numFilled++;  
       break;
       case 3:
         nextPos.setAttribute('class', 'angry__mole');
         nextPos.setAttribute('src', angryMolePath);
+        nextPos.setAttribute('secAboveGround', 1);  
         numFilled++;  
       break;
       default:
@@ -109,6 +130,7 @@ function stopGame(reason){
   started = false;
   hideStopBtn();
   clearInterval(timer);
+  clearInterval(generator);
   showPopUp(reason);
 }
 
@@ -129,6 +151,8 @@ function showPopUp(reason){
     case 'stop':
       popUpMsg.innerText = 'Replay?';
       break;
+    case 'full':
+      popUpMsg.innerText = 'It is full!';
     default:
       console.log('invalid reason!');
       break;
