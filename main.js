@@ -53,6 +53,7 @@ function startGame(){
   started = true;
   initGame();
   showStopBtn();
+  sound.playBg();
 }
 
 function startTimer(){
@@ -152,6 +153,7 @@ function stopGame(reason){
   clearInterval(timer);
   clearInterval(generator);
   showPopUp(reason);
+  sound.stopBackground();
 }
 
 function showStopBtn(){

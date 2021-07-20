@@ -26,6 +26,10 @@ export function playWin(){
   playSound(winSound);
 }
 
+export function stopBackground(){
+  stopSound(bgSound);
+}
+
 
 
 function playSound(sound){
