@@ -4,6 +4,7 @@ import * as sound from './sound.js';
 
 const GAME_DURATION_SEC = 10;
 const MAX_HOLES = 9;
+const REMAIN_SEC = 4;
 
 const gameBtn = document.querySelector('.game__button');
 // const mole = document.querySelector('.mole');
@@ -29,7 +30,6 @@ let started = false;
 let score = 0;
 let timer = undefined;
 let generator = undefined;
-let numFilled = 0;
 gameScore.innerHTML = 0;
 
 gameBtn.addEventListener('click', ()=>{
@@ -43,7 +43,6 @@ gameBtn.addEventListener('click', ()=>{
 
 function initGame(){
   score = 0;
-  numFilled = 0;
   gameScore.innerText = score;
   startTimer();
   clearBoard();
@@ -86,13 +85,22 @@ function clearBoard(){
 function showMoles(){
   let idNum = randomPos();
   let nextPos = document.querySelector(`#pos${idNum}`);
-
+  let counter;
   // console.log(`idNum : ${idNum}, className : ${nextPos.className}`);
   generator = setInterval(() =>{
-    if(numFilled === 9){
-      stopGame('full');
-      return;
+    // if(numFilled === 9){
+    //   stopGame('full');
+    //   return;
+    // }
+
+    for(counter = 1; counter <= MAX_HOLES; counter++){
+      let pos = document.querySelector(`#pos${counter}`);
+      if(pos.className !== 'hole'){
+        let timeAbove = pos.getAttribute('secAboveGround');
+        pos.setAttribute('secAboveGround', parseInt(timeAbove) + 1);
+      }
     }
+
     while(nextPos.className !== 'hole'){
       idNum = randomPos();
       nextPos = document.querySelector(`#pos${idNum}`);
@@ -105,24 +113,36 @@ function showMoles(){
         nextPos.setAttribute('class', 'mole');
         nextPos.setAttribute('src', molePath); 
         nextPos.setAttribute('secAboveGround', 1);  
-        numFilled++;    
-      break;
+        break;
       case 2:
         nextPos.setAttribute('class', 'moles');
         nextPos.setAttribute('src', molesPath);   
         nextPos.setAttribute('secAboveGround', 1);  
-        numFilled++;  
-      break;
+        break;
       case 3:
         nextPos.setAttribute('class', 'angry__mole');
         nextPos.setAttribute('src', angryMolePath);
         nextPos.setAttribute('secAboveGround', 1);  
-        numFilled++;  
-      break;
+        break;
       default:
         console.log('something wrong.');
       break;
     }
+
+    for(counter = 1; counter <= MAX_HOLES; counter++){
+      let pos = document.querySelector(`#pos${counter}`);
+      if(pos.className !== 'hole'){
+        let timeAbove = pos.getAttribute('secAboveGround');
+        console.log(`counter num : ${counter} , timeAbove : ${timeAbove}`);
+        console.log(`timeAbove + 1 : ${parseInt(timeAbove) + 1}`);
+        if(timeAbove == REMAIN_SEC){
+          pos.setAttribute('class', 'hole');
+          pos.setAttribute('src', holePath); 
+          pos.setAttribute('secAboveGround', 0);  
+        }
+      }
+    }
+
   }, 1000);
 }
 
@@ -144,6 +164,7 @@ function hideStopBtn(){
 }
 
 function showPopUp(reason){
+  console.log(`stop reason : ${reason}`);
   switch(reason){
     case 'timeOver':
       popUpMsg.innerText = 'Time over!';
@@ -153,6 +174,7 @@ function showPopUp(reason){
       break;
     case 'full':
       popUpMsg.innerText = 'It is full!';
+      break;
     default:
       console.log('invalid reason!');
       break;
@@ -178,19 +200,16 @@ gameField.addEventListener('click', (event)=>{
     sound.playMole();
     target.setAttribute('class', 'hole');
     target.setAttribute('src', holePath);
-    numFilled --;
     updateScore('mole');
   }else if(target.matches('.angry__mole')){
     sound.playAngry();
     target.setAttribute('class', 'hole');
     target.setAttribute('src', holePath);
-    numFilled --;
     updateScore('angryMole');
   }else if(target.matches('.moles')){
     sound.playMole();
     target.setAttribute('class', 'hole');
     target.setAttribute('src', holePath);
-    numFilled --;
     updateScore('moles');
   }
 });
